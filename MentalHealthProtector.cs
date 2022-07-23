@@ -68,12 +68,24 @@ namespace GE_MentalHealthProtector
             watcher.EnableRaisingEvents = true;
 
             Console.WriteLine("===== [ Game Editor Mental Health Protector ] =====\nMonitoring \"" + config.sourceFolderPath + "\" for changes... Press enter to exit.");
-            Console.ReadLine();
+
+            string command = "";
+
+            do
+            {
+                command = Console.ReadLine();
+
+                if (command == "update")
+                {
+                    Update("update requested by user", "");
+                }
+            }
+            while (command != "exit");
         }
 
-        private static void OnChanged(object sender, FileSystemEventArgs e)
+        private static void Update(string changeType, string updatedFileName)
         {
-            Console.WriteLine("File " + e.ChangeType.ToString().ToLower() + ": " + e.Name + "\nCombining script files...");
+            Console.WriteLine("File " + changeType + ": " + updatedFileName + "\nCombining script files...");
 
             var fileNames = Directory.EnumerateFiles(config.sourceFolderPath).OrderBy(s => s);
 
@@ -86,7 +98,15 @@ namespace GE_MentalHealthProtector
                 outputFile.Write("// " + file + "\n" + fileData + "\n\n");
             }
 
-            Console.WriteLine(fileNames.Count() + " files combined. Result written to: " + config.outputFilePath + "\n==========\nMonitoring \"" + config.sourceFolderPath + "\" for changes... Press enter to exit.");
+            Console.WriteLine(fileNames.Count() + " files combined. Result written to: " + config.outputFilePath);
+            System.Threading.Thread.Sleep(1000);
+            Console.Clear();
+            Console.WriteLine("===== [ Game Editor Mental Health Protector ] =====\nMonitoring \"" + config.sourceFolderPath + "\" for changes... Press enter to exit.");
+        }
+
+        private static void OnChanged(object sender, FileSystemEventArgs e)
+        {
+            Update(e.ChangeType.ToString().ToLower(), e.Name);
         }
     }
 }
